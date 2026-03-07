@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html class="dark" lang="uz">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Tizimga Kirish - POS Tizimi</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
+{% block style %}
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -51,8 +41,9 @@
             min-height: max(884px, 100dvh);
         }
     </style>
-</head>
+{% endblock %}
 
+{% block content %}
 <body class="bg-background-dark text-slate-100 min-h-screen flex flex-col justify-between overflow-hidden">
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="absolute -top-24 -right-24 size-64 bg-primary/10 rounded-full blur-3xl"></div>
@@ -139,4 +130,5 @@
 
 </body>
 
-</html>
+
+{% endblock %}
