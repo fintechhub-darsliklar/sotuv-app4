@@ -1,2 +1,6 @@
-<a href="https://gtihub.com/MuhammadAminAD">Github</a>
-<a href="https://gtihub.com/MuhammadAminAD">Github.com</a>
+# sotuv-app4
+
+
+
+rm -rf venv
+python -m venv venv
