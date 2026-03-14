@@ -9,10 +9,10 @@ def customer_create(request):
         number = 1
     else:
         number = active_last_customer.order_number + 1
-    Customer.objects.create(
+    customer = Customer.objects.create(
         order_number=number
     )
-    return redirect("sotuv_page")
+    return redirect(f"/sotuv/sotuv-page?customer={customer.id}")
 
 
 def customer_delete(request, pk):

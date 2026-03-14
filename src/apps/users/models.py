@@ -19,7 +19,7 @@ class StaffRole(models.TextChoices):
 
 
 class Staff(models.Model):
-    user = models.ForeignKey(User, on_delete=models.RESTRICT)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, related_name="stuff")
     shop = models.ForeignKey(
         "shop.Shop", on_delete=models.SET_NULL, null=True, blank=True
     )

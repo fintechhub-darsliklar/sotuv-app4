@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="uz">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Sotuv (POS) - Ko'p Mijozli Savatcha</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "emerald-accent": "#10b981",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101822",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scanner-overlay {
+            background: linear-gradient(rgba(0,0,0,0) 0%, rgba(19, 109, 236, 0.2) 50%, rgba(0,0,0,0) 100%);
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+    <header
+        class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 pt-12 pb-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+            <button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </button>
+            <h1 class="text-lg font-bold">Sotuv (POS)</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <button class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                <span class="material-symbols-outlined text-[20px]">flashlight_on</span>
+            </button>
+            <button class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                <span class="material-symbols-outlined text-[20px]">search</span>
+            </button>
+        </div>
+    </header>
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <section class="relative h-48 bg-black flex items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 opacity-40">
+                <img alt="Barcode context" class="w-full h-full object-cover grayscale"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgHq81_EYXotw4V-hMd70M6NkA-jXXt4P0U1b3aAjDPc-YnHrYwVUb7-FcUgjNR1WzEwUHV-AOeXHDocuj_kq9Dqn8m43ko0g87F7BWE-NpdnVESZPQDqBLZV8bQG67q7VVyBrK23om77005bUg1ildyscy2nnYjTBdfKR7hcz1J0bjZDyK1DzjUMq3RB29IE25p1Hy13Lskf-O05W4l5Gc92fUseCkwYRcl1NpI4Nvl87265s5koet533UQKOcgtMmuVq9KXYoDQ" />
+            </div>
+            <div
+                class="relative z-10 w-64 h-28 border-2 border-primary rounded-xl flex flex-col items-center justify-center">
+                <div class="scanner-overlay absolute inset-0 w-full h-full pointer-events-none"></div>
+                <div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-accent rounded-tl-md">
+                </div>
+                <div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-accent rounded-tr-md">
+                </div>
+                <div
+                    class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-accent rounded-bl-md">
+                </div>
+                <div
+                    class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-accent rounded-br-md">
+                </div>
+                <p
+                    class="text-[10px] font-bold text-white bg-black/50 px-2 py-1 rounded absolute -bottom-8 uppercase tracking-widest">
+                    Shtrix-kodni skanerlang</p>
+            </div>
+        </section>
+        <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
+                <button
+                    class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all bg-primary text-white shadow-lg shadow-primary/20 flex items-center gap-1.5 justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">person</span>
+                        Mijoz 1
+                    </div>
+                </button>
+                <button
+                    class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">person</span>
+                        Mijoz 2
+                    </div>
+                    <span
+                        class="material-symbols-outlined text-[14px] ml-1 text-slate-400 hover:text-red-500">close</span>
+                </button>
+                <button
+                    class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">person</span>
+                        Mijoz 3
+                    </div>
+                    <span
+                        class="material-symbols-outlined text-[14px] ml-1 text-slate-400 hover:text-red-500">close</span>
+                </button>
+                <button
+                    class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all bg-emerald-accent/10 text-emerald-accent border border-emerald-accent/20 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">add</span>
+                    Yangi
+                </button>
+            </div>
+        </div>
+        <section class="flex-1 flex flex-col px-4 pt-4 pb-32">
+            <div class="flex items-center justify-between mb-4">
+                <h2
+                    class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    Savat <span
+                        class="size-5 flex items-center justify-center bg-slate-200 dark:bg-slate-800 rounded-full text-[10px]">3</span>
+                </h2>
+                <div class="flex items-center gap-3">
+                    <button
+                        class="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                    </button>
+                    <button class="text-xs font-bold text-red-500 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                        Tozalash
+                    </button>
+                </div>
+            </div>
+            <div class="space-y-3 overflow-y-auto max-h-[40vh] hide-scrollbar">
+                <div
+                    class="bg-white dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-3">
+                    <div
+                        class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+                        <img alt="Product" class="w-full h-full object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBi7-vJTsx5B2uuMh6KwUr-O6ologiUEJyTNjhBj1BebsEnDbNw0w1ovS6rpaext35PGiSUrSoNXbGBj52J2OwRdUpF-Y2_mhCI4brVdJReJF0aQiLPDrUegKv8V-zIesNgG0y4SXX8h9EN8gLIQn-RF-Cw3eIMvvGBONhzl-AzG5F4QeUEO-yCXBx869G84OJw5i6yF35LABVt4wvLSxwBVAOG9pY3R9Im_OREncB8J8NWPQi5rzmije2g1eQZ6ivuvxOGAlEqsao" />
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold">Coca-Cola 0.5L</h3>
+                        <p class="text-xs text-slate-500">7,500 UZS</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 rounded-lg p-1">
+                        <button
+                            class="size-7 rounded-md bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm">-</button>
+                        <span class="text-xs font-bold w-4 text-center">2</span>
+                        <button
+                            class="size-7 rounded-md bg-primary text-white flex items-center justify-center shadow-sm">+</button>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-3">
+                    <div
+                        class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
+                        <img alt="Product" class="w-full h-full object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb4YfWMS0a7wNQ9-S93GBz8uyjiUkJ-QMLXpKVBt6NpPcEPr_iNJoQQUSyEZmJ9csDtIhvHOCZl5uOY_3L_xIjMz_sEBKe7aAOMXtT6XgE5ZVaNnnX2Z-19UJTm92D1XrZSK9zIFz75IWhIov-KN1fAmvgbnvJNLLL7oC-OLBL_roJQzav9A3-63lQeFbxZg6PzogYjZuEvKIVytfv2Pm3sXQuIlxq4Aoo2CfDIMZU_9d8iIzNEQLBOFUjgAV22PY077ifTMNJWOA" />
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold">Lays Chips 80g</h3>
+                        <p class="text-xs text-slate-500">12,000 UZS</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 rounded-lg p-1">
+                        <button
+                            class="size-7 rounded-md bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm">-</button>
+                        <span class="text-xs font-bold w-4 text-center">1</span>
+                        <button
+                            class="size-7 rounded-md bg-primary text-white flex items-center justify-center shadow-sm">+</button>
+                    </div>
+                </div>
+                <div
+                    class="bg-white dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-3">
+                    <div
+                        class="size-12 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden text-slate-400">
+                        <span class="material-symbols-outlined">image</span>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold">Non (Yopgan)</h3>
+                        <p class="text-xs text-slate-500">3,500 UZS</p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 rounded-lg p-1">
+                        <button
+                            class="size-7 rounded-md bg-white dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm">-</button>
+                        <span class="text-xs font-bold w-4 text-center">1</span>
+                        <button
+                            class="size-7 rounded-md bg-primary text-white flex items-center justify-center shadow-sm">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label
+                            class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Chegirma</label>
+                        <div class="relative">
+                            <select
+                                class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl text-sm font-semibold py-3 pl-3 pr-10 appearance-none focus:ring-2 focus:ring-primary/50">
+                                <option>Chegirma yo'q</option>
+                                <option>5% Chegirma</option>
+                                <option>10% Chegirma</option>
+                                <option>Maxsus - 5,000</option>
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">To'lov
+                            turi</label>
+                        <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+                            <button
+                                class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-sm">Naqd</button>
+                            <button class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-500">Karta</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-primary/10 dark:bg-primary/5 border border-primary/20 p-4 rounded-2xl mt-2">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-sm text-slate-500 dark:text-slate-400">Jami:</span>
+                        <span class="text-sm font-medium line-through opacity-50">30,500 UZS</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base font-bold text-slate-900 dark:text-white">To'lanadigan:</span>
+                        <span class="text-xl font-black text-emerald-accent">28,975 <span
+                                class="text-xs font-normal">UZS</span></span>
+                    </div>
+                </div>
+                <button
+                    class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary/30 active:scale-95 transition-all">
+                    <span class="material-symbols-outlined">payments</span>
+                    <span>To'lovni amalga oshirish</span>
+                </button>
+            </div>
+        </section>
+    </main>
+    <nav class="fixed bottom-0 left-0 right-0 z-40">
+        <div
+            class="bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 pb-8 pt-3 px-6 flex justify-between items-center">
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="text-[10px] font-bold">Asosiy</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-primary" href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">point_of_sale</span>
+                <span class="text-[10px] font-bold">Sotuv</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined">history</span>
+                <span class="text-[10px] font-bold">Tarix</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px] font-bold">Profil</span>
+            </a>
+        </div>
+    </nav>
+</body>
+
+</html>
