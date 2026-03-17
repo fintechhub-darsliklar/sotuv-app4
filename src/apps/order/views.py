@@ -33,20 +33,24 @@ def sotuv_page(request):
 
 def sotuv_products_list_page(request, customer_id):
     customer = Customer.objects.get(id=customer_id)
+    selected_category_id = request.GET.get("category_id", None)
     categories = Category.objects.all()
     if len(categories) == 0:
         selected_category_id = 0
         selected_category = None
     else:
-        selected_category_id = categories.first()
-        selected_category = categories.first().id
+        if selected_category_id is None:
+            selected_category = categories.first()
+            selected_category_id = categories.first().id
+        else:
+            selected_category = categories.get(id=selected_category_id)
     products = Product.objects.filter(category=selected_category)
-    
+    print("cat id", selected_category_id)
     context = {
         "customer_id": customer_id,
         "categories": categories,
         "products": products,
-        "selected_category_id": selected_category_id,
+        "selected_category_id": int(selected_category_id),
         "cart_list_count": customer.carts.count(),
         "total_price": customer.get_cart_total_price()
     }

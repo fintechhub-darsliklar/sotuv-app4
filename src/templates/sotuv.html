@@ -20,6 +20,8 @@
         },
     }
 </script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
 <style type="text/tailwindcss">
     body {
             font-family: 'Manrope', sans-serif;
@@ -75,28 +77,44 @@
     </header>
     <main class="flex-1 flex flex-col overflow-hidden">
         <section class="relative h-48 bg-black flex items-center justify-center overflow-hidden">
+
+            <!-- Background -->
             <div class="absolute inset-0 opacity-40">
                 <img alt="Barcode context" class="w-full h-full object-cover grayscale"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgHq81_EYXotw4V-hMd70M6NkA-jXXt4P0U1b3aAjDPc-YnHrYwVUb7-FcUgjNR1WzEwUHV-AOeXHDocuj_kq9Dqn8m43ko0g87F7BWE-NpdnVESZPQDqBLZV8bQG67q7VVyBrK23om77005bUg1ildyscy2nnYjTBdfKR7hcz1J0bjZDyK1DzjUMq3RB29IE25p1Hy13Lskf-O05W4l5Gc92fUseCkwYRcl1NpI4Nvl87265s5koet533UQKOcgtMmuVq9KXYoDQ" />
             </div>
+
+            <!-- Scanner box -->
             <div
-                class="relative z-10 w-64 h-28 border-2 border-primary rounded-xl flex flex-col items-center justify-center">
-                <div class="scanner-overlay absolute inset-0 w-full h-full pointer-events-none"></div>
-                <div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-accent rounded-tl-md">
+                class="relative z-10 w-64 h-28 border-2 border-green-400 rounded-xl flex items-center justify-center overflow-hidden">
+
+                <!-- CAMERA -->
+                <div id="reader" class="absolute inset-0"></div>
+
+                <!-- Overlay -->
+                <div class="absolute inset-0 border-2 border-green-400 rounded-xl pointer-events-none"></div>
+
+                <!-- Corners -->
+                <div class="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-green-400 rounded-tl-md"></div>
+                <div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-green-400 rounded-tr-md">
                 </div>
-                <div class="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-accent rounded-tr-md">
+                <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-green-400 rounded-bl-md">
                 </div>
-                <div
-                    class="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-accent rounded-bl-md">
+                <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-green-400 rounded-br-md">
                 </div>
-                <div
-                    class="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-accent rounded-br-md">
-                </div>
+
+                <!-- Text -->
                 <p
                     class="text-[10px] font-bold text-white bg-black/50 px-2 py-1 rounded absolute -bottom-8 uppercase tracking-widest">
-                    Shtrix-kodni skanerlang</p>
+                    Shtrix-kodni skanerlang
+                </p>
             </div>
+
         </section>
+
+        <!-- RESULT -->
+        <div id="result" class="text-center mt-4 text-white"></div>
+
         <div class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800">
             <div class="flex items-center gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
                 {% for customer in customers %}
@@ -145,10 +163,10 @@
 
                 <div class="flex items-center gap-2">
                     <a href="{% url 'sotuv_products_list_page' customer_id=selected_customer %}">
-                    <button
-                        class="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md shadow-primary/20 hover:scale-105 active:scale-95 transition">
-                        <span class="material-symbols-outlined text-[20px]">add</span>
-                    </button>
+                        <button
+                            class="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md shadow-primary/20 hover:scale-105 active:scale-95 transition">
+                            <span class="material-symbols-outlined text-[20px]">add</span>
+                        </button>
                     </a>
 
                     <a href="{% url 'cart_clear_page' pk=selected_customer %}"
@@ -177,7 +195,7 @@
 
                     <div class="flex-1">
                         <h3 class="text-sm font-bold">{{ cart.product.name }}</h3>
-                        <p class="text-xs text-slate-500">{{ cart.product.price }} UZS</p>
+                        <p class="text-xs text-slate-500">{{ cart.product.current_price }} UZS</p>
                     </div>
 
                     <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 rounded-lg p-1">
@@ -272,5 +290,31 @@
             </div>
         </section>
     </main>
+    
+<script>
+    function onScanSuccess(decodedText) {
+        document.getElementById("result").innerHTML = "Topildi: " + decodedText;
+    }
 
+    const html5Qrcode = new Html5Qrcode("reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices.length) {
+            const backCamera = devices.find(device =>
+                device.label.toLowerCase().includes('back')
+            ) || devices[0];
+
+            html5Qrcode.start(
+                backCamera.id,
+                {
+                    fps: 10,
+                    qrbox: { width: 200, height: 100 }
+                },
+                onScanSuccess
+            );
+        }
+    }).catch(err => {
+        console.error(err);
+    });
+</script>
     {% endblock %}

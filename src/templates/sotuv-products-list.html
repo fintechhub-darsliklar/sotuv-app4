@@ -45,9 +45,11 @@
             class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 border-b border-slate-200 dark:border-slate-800">
             <button
                 class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
-                <span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span>
+                 <a href="{% url 'sotuv_page' %}?customer={{customer_id}}"><span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back</span></a>
             </button>
-            <h2 class="ml-2 text-lg font-bold leading-tight tracking-tight flex-1">Savatga mahsulot qo'shish</h2>
+           
+             <h2 class="ml-2 text-lg font-bold leading-tight tracking-tight flex-1">Savatga mahsulot qo'shish</h2>
+            </a>
             <button
                 class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                 <span class="material-symbols-outlined text-slate-900 dark:text-slate-100">barcode_scanner</span>
@@ -67,6 +69,7 @@
         </div>
         <div class="flex gap-3 px-4 pb-4 overflow-x-auto no-scrollbar">
             {% for category in categories %}
+            <a href="?category_id={{category.id}}">
             {% if selected_category_id == category.id %}
             <button
                 class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-xl bg-primary px-5 text-white shadow-lg shadow-primary/20">
@@ -76,7 +79,7 @@
                     {% endif %}
                     <span class="text-sm font-medium">{{category.name}}</span>
                 </button>
-
+                </a>
                 {% endfor %}
         </div>
         <main class="flex-1 px-4 space-y-3 pb-24">
