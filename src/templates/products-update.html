@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html class="dark" lang="uz">
 
@@ -49,11 +50,13 @@
     </header>
 
     <main class="p-4 pb-28">
-        <form method="post" enctype="multipart/form-data" class="space-y-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
             {% csrf_token %}
 
             <!-- IMAGE -->
             <div>
+                <p class="text-sm font-semibold mb-2">Mahsulot rasmi</p>
+
                 <input type="file" id="import-image" name="image" class="hidden" accept="image/*">
 
                 <label for="import-image">
@@ -70,51 +73,74 @@
                             <span class="material-symbols-outlined text-3xl text-primary">add_a_photo</span>
                             <p class="text-sm text-slate-400">Rasm yuklash</p>
                         </div>
-
                     </div>
                 </label>
             </div>
 
             <!-- NAME -->
-            <input type="text" name="product_name" value="{{product.name}}" placeholder="Mahsulot nomi"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Mahsulot nomi</label>
+                <input type="text" name="product_name" value="{{product.name}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
             <!-- BARCODE -->
-            <input type="text" name="product_barcode" value="{{product.barcode}}" placeholder="Barcode"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Barcode</label>
+                <input type="text" name="product_barcode" value="{{product.barcode}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
             <!-- CATEGORY -->
-            <select name="product_category" class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
-                <option value="">Kategoriya tanlang</option>
-                {% for category in categories %}
-                <option value="{{category.id}}" >
-                    {{category.name}}
-                </option>
-                {% endfor %}
-            </select>
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Kategoriya</label>
+                <select name="product_category" class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+                    <option value="">Tanlang</option>
+                    {% for category in categories %}
+                    <option value="{{category.id}}" {% if product.category.id==category.id %}selected{% endif %}>
+                        {{category.name}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- PRICES -->
-            <input type="number" name="input_price" value="{{product.input_price}}" placeholder="Tannarx"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Tannarx</label>
+                <input type="number" name="input_price" value="{{product.input_price}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
-            <input type="number" name="current_price" value="{{product.current_price}}" placeholder="Sotuv narxi"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Sotuv narxi</label>
+                <input type="number" name="current_price" value="{{product.current_price}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
-            <input type="number" name="wholesale_price" value="{{product.wholesale_price}}" placeholder="Ulgurji narx"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Ulgurji narx</label>
+                <input type="number" name="wholesale_price" value="{{product.wholesale_price}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
             <!-- STOCK -->
-            <input type="number" name="qoldiq" value="{{product.qoldiq}}" placeholder="Qoldiq"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Qoldiq</label>
+                <input type="number" name="qoldiq" value="{{product.qoldiq}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
-            <input type="number" name="min_qoldiq" value="{{product.min_qoldiq}}" placeholder="Minimal qoldiq"
-                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            <div>
+                <label class="text-sm font-semibold mb-1 block">Minimal qoldiq</label>
+                <input type="number" name="min_qoldiq" value="{{product.min_qoldiq}}"
+                    class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+            </div>
 
             <!-- STATUS -->
-            <label class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl">
-                <span>Aktiv</span>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <label class="text-sm font-semibold">Aktiv holat</label>
                 <input type="checkbox" name="status" {% if product.status %}checked{% endif %}>
-            </label>
+            </div>
 
             <!-- SUBMIT -->
             <button class="w-full bg-primary text-white py-4 rounded-xl font-bold">
@@ -149,3 +175,4 @@
 </body>
 
 </html>
+```

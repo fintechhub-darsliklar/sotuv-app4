@@ -6,11 +6,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Yangi Mahsulot Qo'shish Formasi</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -22,9 +20,7 @@
                         "background-light": "#f6f7f8",
                         "background-dark": "#101822",
                     },
-                    fontFamily: {
-                        "display": ["Manrope"]
-                    },
+                    fontFamily: { "display": ["Manrope"] },
                     borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
                 },
             },
@@ -32,36 +28,46 @@
     </script>
     
     <style type="text/tailwindcss">
-        body {
-            font-family: 'Manrope', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        input:focus, select:focus {
-            outline: none;
-            box-shadow: none !important;
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
+        body { font-family: 'Manrope', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input:focus, select:focus { outline: none; box-shadow: none !important; }
+        
+        /* Modal uchun qo'shimcha stil */
+        #reader { width: 100% !important; border: none !important; border-radius: 1rem; overflow: hidden; }
+        #reader__dashboard_section_csr button {
+            background-color: #136dec !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            margin-top: 10px !important;
         }
     </style>
 </head>
 
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 flex flex-col min-h-screen">
-    <header
-        class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/90 backdrop-blur-md px-4 pt-10 pb-4">
+    
+    <div id="scanner-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 class="font-bold">Shtrix kodni skanerlash</h3>
+                <button type="button" onclick="closeScanner()" class="p-2 text-slate-500 hover:text-red-500">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-4">
+                <div id="reader"></div>
+            </div>
+            <div class="p-4 text-center text-xs text-slate-500">
+                Kamerani shtrix kodga qarating
+            </div>
+        </div>
+    </div>
+
+    <header class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/90 backdrop-blur-md px-4 pt-10 pb-4">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <a class="p-2 -ml-2 rounded-full active:bg-slate-200 dark:active:bg-slate-800 transition-colors"
-                    href="{% url 'products_page' %}">
+                <a class="p-2 -ml-2 rounded-full active:bg-slate-200 dark:active:bg-slate-800 transition-colors" href="#">
                     <span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
                 </a>
                 <h1 class="text-xl font-bold">Yangi mahsulot</h1>
@@ -69,177 +75,150 @@
             <button class="text-primary font-bold text-sm">Bekor qilish</button>
         </div>
     </header>
+
     <main class="flex-1 px-4 pb-32">
         <form class="space-y-6" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
             <div class="mt-4 mb-8">
                 <input type="file" class="hidden" id="import-image" name="image" accept="image/*">
-
                 <label for="import-image">
-                    <div id="upload-box"
-                        class="w-full aspect-video rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-2 active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer overflow-hidden">
-
-                        <!-- PREVIEW IMAGE -->
+                    <div id="upload-box" class="w-full aspect-video rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-2 active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer overflow-hidden">
                         <img id="preview-image" class="hidden w-full h-full object-cover rounded-3xl" />
-
-                        <!-- DEFAULT CONTENT -->
                         <div id="upload-placeholder" class="flex flex-col items-center gap-2">
                             <div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                                 <span class="material-symbols-outlined text-3xl">add_a_photo</span>
                             </div>
-                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">
-                                Rasm yuklash
-                            </span>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Rasm yuklash</span>
                         </div>
-
                     </div>
                 </label>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label
-                        class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Mahsulot
-                        nomi</label>
-                    <input
-                        class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm"
-                        placeholder="Masalan: Olma sharbati" type="text" name="product_name" />
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Mahsulot nomi</label>
+                    <input class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm" placeholder="Masalan: Olma sharbati" type="text" name="product_name" />
                 </div>
+                
                 <div>
-                    <label
-                        class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Barcode</label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Barcode</label>
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input
-                                class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm"
-                                placeholder="Shtrix kodni kiriting" type="text" name="product_barcode" />
+                            <input id="product_barcode" class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm" placeholder="Shtrix kodni kiriting" type="text" name="product_barcode" />
                         </div>
-                        <button
-                            class="bg-primary/10 text-primary p-4 rounded-2xl flex items-center justify-center active:scale-95 transition-transform"
-                            type="button">
+                        <button id="start-scanner" class="bg-primary/10 text-primary p-4 rounded-2xl flex items-center justify-center active:scale-95 transition-transform" type="button">
                             <span class="material-symbols-outlined">barcode_scanner</span>
                         </button>
                     </div>
                 </div>
+
                 <div>
-                    <label
-                        class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Kategoriya</label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Kategoriya</label>
                     <div class="relative">
-                        <select title="Category" name="product_category" required
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm appearance-none">
+                        <select title="Category" name="product_category" required class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm appearance-none">
                             <option value="">Kategoriyani tanlang</option>
-                            {% for category in categories %}
-                            <option value="{{category.id}}">{{category.name}}</option>
-                            {% endfor %}
+                            <option value="1">Ichimliklar</option>
+                            <option value="2">Oziq-ovqat</option>
                         </select>
-                        <span
-                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
+                        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
                     </div>
                 </div>
             </div>
+
             <div class="pt-2">
                 <h2 class="text-sm font-bold text-primary mb-4 ml-1 flex items-center gap-2">
                     <span class="material-symbols-outlined text-lg">payments</span> Narxlar (UZS)
                 </h2>
                 <div class="grid grid-cols-2 gap-3">
                     <div class="col-span-2">
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Tannarx</label>
-                        <input
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm font-semibold"
-                            placeholder="0.00" type="number" name="input_price" />
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Tannarx</label>
+                        <input class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm font-semibold" placeholder="0.00" type="number" name="input_price" />
                     </div>
                     <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Sotuv
-                            narxi</label>
-                        <input
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-emerald-custom shadow-sm font-semibold text-emerald-custom"
-                            placeholder="0.00" type="number" name="current_price" />
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Sotuv narxi</label>
+                        <input class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-emerald-custom shadow-sm font-semibold text-emerald-custom" placeholder="0.00" type="number" name="current_price" />
                     </div>
                     <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Ulgurji
-                            narx</label>
-                        <input
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm font-semibold"
-                            placeholder="0.00" type="number" name="wholesale_price" />
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Ulgurji narx</label>
+                        <input class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm font-semibold" placeholder="0.00" type="number" name="wholesale_price" />
                     </div>
                 </div>
             </div>
-            <div class="pt-2">
-                <h2 class="text-sm font-bold text-primary mb-4 ml-1 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-lg">inventory_2</span> Ombor
-                </h2>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Dastlabki
-                            soni</label>
-                        <input
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-primary shadow-sm"
-                            placeholder="0" type="number" name="qoldiq" />
-                    </div>
-                    <div>
-                        <label
-                            class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Minimal
-                            qoldiq</label>
-                        <input
-                            class="w-full bg-white dark:bg-slate-800 border-none rounded-2xl py-4 px-4 text-base focus:ring-2 focus:ring-red-500 shadow-sm"
-                            placeholder="5" type="number" name="min_qoldiq" />
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl flex items-center justify-between shadow-sm">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="size-10 rounded-xl bg-emerald-custom/10 text-emerald-custom flex items-center justify-center">
-                        <span class="material-symbols-outlined">check_circle</span>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold">Aktiv holat</p>
-                        <p class="text-[10px] text-slate-400">Mahsulot sotuvda ko'rinadi</p>
-                    </div>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input checked="" placeholder="salom" class="sr-only peer" type="checkbox" name="status" />
-                    <div
-                        class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-custom">
-                    </div>
-                </label>
-            </div>
-            <div
-                class="fixed bottom-0 left-0 right-0 bg-background-light/80 dark:bg-background-dark/90 backdrop-blur-xl p-4 border-t border-slate-200 dark:border-slate-800 z-40">
-                <button type="submit"
-                    class="w-full bg-primary text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined">save</span>
-                    Saqlash
+
+            <div class="fixed bottom-0 left-0 right-0 bg-background-light/80 dark:bg-background-dark/90 backdrop-blur-xl p-4 border-t border-slate-200 dark:border-slate-800 z-40">
+                <button type="submit" class="w-full bg-primary text-white py-4 rounded-2xl font-bold text-base shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">save</span> Saqlash
                 </button>
             </div>
         </form>
     </main>
+
 <script>
-    const input = document.getElementById('import-image');
+    // RASM PREVIEW LOGIKASI
+    const imageInput = document.getElementById('import-image');
     const preview = document.getElementById('preview-image');
     const placeholder = document.getElementById('upload-placeholder');
 
-    input.addEventListener('change', function () {
+    imageInput.addEventListener('change', function () {
         const file = this.files[0];
-
         if (file) {
             const reader = new FileReader();
-
             reader.onload = function (e) {
                 preview.src = e.target.result;
-
                 preview.classList.remove('hidden');
                 placeholder.classList.add('hidden');
             };
-
             reader.readAsDataURL(file);
         }
     });
+
+    // BARCODE SCANNER LOGIKASI
+    const scannerModal = document.getElementById('scanner-modal');
+    const barcodeInput = document.getElementById('product_barcode');
+    const startBtn = document.getElementById('start-scanner');
+    let html5QrCode;
+
+    // Skanerni ochish
+    startBtn.addEventListener('click', () => {
+        scannerModal.classList.remove('hidden');
+        html5QrCode = new Html5Qrcode("reader");
+        
+        const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+
+        // Orqa kamerani ishlatishga harakat qilish
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            config,
+            (decodedText) => {
+                // Kod topilganda
+                barcodeInput.value = decodedText;
+                closeScanner();
+                // Effekt uchun inputga fokus berish
+                barcodeInput.classList.add('ring-2', 'ring-emerald-500');
+                setTimeout(() => barcodeInput.classList.remove('ring-emerald-500'), 2000);
+            },
+            (errorMessage) => {
+                // Doimiy loglarni oldini olish uchun bo'sh qoldirildi
+            }
+        ).catch((err) => {
+            console.error("Kamera ochilmadi:", err);
+            alert("Kameraga ruxsat berilmadi yoki xato yuz berdi.");
+            closeScanner();
+        });
+    });
+
+    // Skanerni yopish
+    function closeScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                scannerModal.classList.add('hidden');
+            }).catch(() => {
+                scannerModal.classList.add('hidden');
+            });
+        } else {
+            scannerModal.classList.add('hidden');
+        }
+    }
 </script>
 </body>
-
 </html>
