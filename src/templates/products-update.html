@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="dark" lang="uz">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mahsulotni tahrirlash</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#136dec",
+                        "emerald-custom": "#10b981",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101822",
+                    },
+                    fontFamily: {
+                        display: ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+
+    <header class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/90 backdrop-blur px-4 py-4">
+        <div class="flex items-center gap-2">
+            <a href="{% url 'products_page' %}">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </a>
+            <h1 class="text-lg font-bold">Mahsulotni tahrirlash</h1>
+        </div>
+    </header>
+
+    <main class="p-4 pb-28">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- IMAGE -->
+            <div>
+                <input type="file" id="import-image" name="image" class="hidden" accept="image/*">
+
+                <label for="import-image">
+                    <div
+                        class="w-full aspect-video rounded-2xl border-2 border-dashed flex items-center justify-center overflow-hidden cursor-pointer">
+
+                        {% if product.image %}
+                        <img id="preview-image" src="{{ product.image.url }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <img id="preview-image" class="hidden w-full h-full object-cover">
+                        {% endif %}
+
+                        <div id="placeholder" class="{% if product.image %}hidden{% endif %} text-center">
+                            <span class="material-symbols-outlined text-3xl text-primary">add_a_photo</span>
+                            <p class="text-sm text-slate-400">Rasm yuklash</p>
+                        </div>
+
+                    </div>
+                </label>
+            </div>
+
+            <!-- NAME -->
+            <input type="text" name="product_name" value="{{product.name}}" placeholder="Mahsulot nomi"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <!-- BARCODE -->
+            <input type="text" name="product_barcode" value="{{product.barcode}}" placeholder="Barcode"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <!-- CATEGORY -->
+            <select name="product_category" class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+                <option value="">Kategoriya tanlang</option>
+                {% for category in categories %}
+                <option value="{{category.id}}" >
+                    {{category.name}}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- PRICES -->
+            <input type="number" name="input_price" value="{{product.input_price}}" placeholder="Tannarx"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <input type="number" name="current_price" value="{{product.current_price}}" placeholder="Sotuv narxi"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <input type="number" name="wholesale_price" value="{{product.wholesale_price}}" placeholder="Ulgurji narx"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <!-- STOCK -->
+            <input type="number" name="qoldiq" value="{{product.qoldiq}}" placeholder="Qoldiq"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <input type="number" name="min_qoldiq" value="{{product.min_qoldiq}}" placeholder="Minimal qoldiq"
+                class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
+
+            <!-- STATUS -->
+            <label class="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl">
+                <span>Aktiv</span>
+                <input type="checkbox" name="status" {% if product.status %}checked{% endif %}>
+            </label>
+
+            <!-- SUBMIT -->
+            <button class="w-full bg-primary text-white py-4 rounded-xl font-bold">
+                Yangilash
+            </button>
+
+        </form>
+    </main>
+
+    <script>
+        const input = document.getElementById('import-image');
+        const preview = document.getElementById('preview-image');
+        const placeholder = document.getElementById('placeholder');
+
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -30,6 +30,7 @@
             },
         }
     </script>
+    
     <style type="text/tailwindcss">
         body {
             font-family: 'Manrope', sans-serif;
@@ -72,14 +73,25 @@
         <form class="space-y-6" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mt-4 mb-8">
-                <input type="file" class="hidden" id="import-image" name="image">
+                <input type="file" class="hidden" id="import-image" name="image" accept="image/*">
+
                 <label for="import-image">
-                    <div
-                        class="w-full aspect-video rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-2 active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer">
-                        <div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                            <span class="material-symbols-outlined text-3xl">add_a_photo</span>
+                    <div id="upload-box"
+                        class="w-full aspect-video rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-col items-center justify-center gap-2 active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer overflow-hidden">
+
+                        <!-- PREVIEW IMAGE -->
+                        <img id="preview-image" class="hidden w-full h-full object-cover rounded-3xl" />
+
+                        <!-- DEFAULT CONTENT -->
+                        <div id="upload-placeholder" class="flex flex-col items-center gap-2">
+                            <div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                <span class="material-symbols-outlined text-3xl">add_a_photo</span>
+                            </div>
+                            <span class="text-sm font-medium text-slate-500 dark:text-slate-400">
+                                Rasm yuklash
+                            </span>
                         </div>
-                        <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Rasm yuklash</span>
+
                     </div>
                 </label>
             </div>
@@ -206,7 +218,28 @@
             </div>
         </form>
     </main>
+<script>
+    const input = document.getElementById('import-image');
+    const preview = document.getElementById('preview-image');
+    const placeholder = document.getElementById('upload-placeholder');
 
+    input.addEventListener('change', function () {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 </body>
 
 </html>

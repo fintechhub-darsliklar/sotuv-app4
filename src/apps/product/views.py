@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Category, Product
 # Create your views here.
 
@@ -8,9 +8,17 @@ def monitoring_page(request):
 
 
 def products_page(request):
-    products = Product.objects.all()
+    category_id = request.GET.get("category_id", 'all')
+    if category_id == "all":
+        products = Product.objects.all()
+    else:
+        products = Product.objects.filter(category__id=category_id)
+        category_id = int(category_id)
+    categories = Category.objects.all()
     context = {
-        'products': products
+        'products': products,
+        "categories": categories,
+        "selected_category_id": category_id
     }
     return render(request, "products.html", context=context)
 
@@ -51,3 +59,51 @@ def products_create_page(request):
         'categories': categories
     }
     return render(request, "products-create.html", context=context)
+
+
+def categories_create_page(request):
+    if request.method == 'POST':
+        data = request.POST  
+        category_name = data.get("category_name")
+        shop = request.user.stuff.first().shop
+        if category_name and shop:
+            Category.objects.create(
+                name=category_name,
+                shop=shop
+            )
+        return redirect("products_page")
+    return render(request, "category-create.html", context={})
+
+def category_delete(request, pk):
+    Category.objects.get(id=pk).delete()
+    return redirect("products_page")
+
+
+def product_delete(request, pk):
+    Product.objects.get(id=pk).delete()
+    return redirect("products_page")
+
+
+def product_update(request, pk):
+    product = get_object_or_404(Product, id=pk)
+
+    if request.method == "POST":
+        product.name = request.POST.get("product_name")
+        product.barcode = request.POST.get("product_barcode")
+        product.input_price = request.POST.get("input_price")
+        product.current_price = request.POST.get("current_price")
+        product.wholesale_price = request.POST.get("wholesale_price")
+        product.qoldiq = request.POST.get("qoldiq")
+        product.min_qoldiq = request.POST.get("min_qoldiq")
+        product.status = True if request.POST.get("status") else False
+
+        if request.FILES.get("image"):
+            product.image = request.FILES.get("image")
+
+        product.save()
+        return redirect("products_page")
+
+    return render(request, "products-update.html", {
+        "product": product,
+        "categories": Category.objects.all()
+    })
