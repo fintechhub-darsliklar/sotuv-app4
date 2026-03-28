@@ -10,6 +10,11 @@ urlpatterns = [
     path('cart/update/increase/<int:pk>/', views.cart_increase_page, name="cart_increase_page"),
     path('cart/update/decrease/<int:pk>/', views.cart_decrease_page, name="cart_decrease_page"),
     path('cart/delete/customer-with/<int:pk>/', views.cart_clear_page, name="cart_clear_page"),
+
+
+    # order
+    path('order/create/<int:customer_id>/', views.order_create_page, name="order_create_page"),
+
     
     # /cart/add-by-barcode/6/1234567890128
 ]

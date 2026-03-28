@@ -47,8 +47,9 @@
     <!-- Header -->
     <header class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 pt-12 pb-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
         <div class="flex items-center gap-3">
-            <button onclick="history.back()" class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
-                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+        
+            <button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
+                <a href="{% url 'dashboard_page' %}"><span class="material-symbols-outlined">arrow_back_ios_new</span></a>
             </button>
             <h1 class="text-lg font-bold">Sotuv (POS)</h1>
         </div>
@@ -180,7 +181,11 @@
                 </div>
                 {% endif %}
             </div>
+            
+            
             <div class="mt-6 space-y-4">
+                <form method="post" action="{% url 'order_create_page' customer_id=selected_customer %}">
+                {% csrf_token %}
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
                         <label
@@ -216,7 +221,7 @@
                             </label>
 
                             <label class="flex-1">
-                                <input type="radio" name="payment_type" value="card" class="hidden peer">
+                                <input type="radio" name="payment_type" value="cart" class="hidden peer">
                                 <div class="text-center py-2 text-xs font-bold rounded-lg 
                         peer-checked:bg-white 
                         peer-checked:dark:bg-slate-400  
@@ -245,11 +250,13 @@
                 <button {% if not cart_list %} disabled
                     class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary/30 active:scale-95 transition-all cursor-not-allowed"
                     {% else %}
-                    class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary/30 active:scale-95 transition-all">
+                    class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-primary/30 active:scale-95 transition-all"
+                    type="submit">
                     {% endif %}
                     <span>To'lovni amalga oshirish</span>
 
                 </button>
+                </form>
             </div>
         </section>
     </main>

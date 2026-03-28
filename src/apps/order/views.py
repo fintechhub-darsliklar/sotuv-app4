@@ -1,13 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.customer.models import Customer
-from apps.order.models import Cart
+from apps.order.models import Cart, Order, OrderItem, PaymentType
 from apps.product.models import Product, Category
 # Create your views here.
 
 
 def sotuv_page(request):
     selected_customer = request.GET.get("customer", None)
-    customers = Customer.objects.all()
+    customers = Customer.objects.filter(is_active=True)
     cart_list = []
     if selected_customer is None:
         first_customer = customers.first()
@@ -107,6 +107,8 @@ def cart_increase_page(request, pk):
     if cart:
         customer_id = cart.customer.id
         cart.quantity += 1
+        if cart.quantity > cart.product.qoldiq:
+            return redirect(f"/sotuv/sotuv-page?customer={customer_id}")
         cart.save()
     return redirect(f"/sotuv/sotuv-page?customer={customer_id}")
 
@@ -129,5 +131,43 @@ def cart_clear_page(request, pk):
     if customer:
         customer.carts.all().delete()
     return redirect(f"/sotuv/sotuv-page?customer={pk}")
+
+
+# order qismi
+
+
+def order_create_page(request, customer_id):
+
+    customer = get_object_or_404(Customer, pk=customer_id)
+    if customer:
+        payment_type = request.POST.get("payment_type", "cash")
+        discount = request.POST.get("discount", 0)
+        stuff = request.user.stuff.last()
+        order = Order.objects.create(
+            payment_type=PaymentType.CASH if payment_type == "cash" else PaymentType.CART,
+            customer=customer,
+            staff=stuff,
+            total_price=0
+        )
+        total_price = 0
+        for cart in customer.carts.all():
+            total_price_item = cart.product.current_price * cart.quantity
+            OrderItem.objects.create(
+                order=order,
+                product=cart.product,
+                staff=cart.staff,
+                quantity=cart.quantity,
+                total_price=total_price_item
+            )
+            total_price += total_price_item
+            cart.product.qoldiq = cart.product.qoldiq - cart.quantity
+            cart.product.save()
+        order.total_price = total_price
+        order.save()
+        customer.carts.all().delete()
+        customer.is_active = False
+        customer.save()
+        return redirect("sotuv_page")
+        
 
 

@@ -39,5 +39,6 @@ class ProductInput(models.Model):
     new_input_price = models.DecimalField(default=0, max_digits=20, decimal_places=2)
     new_current_price = models.DecimalField(default=0, max_digits=20, decimal_places=2)
     new_wholesale_price = models.DecimalField(default=0, max_digits=20, decimal_places=2)
+    is_added = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

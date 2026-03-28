@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="dark" lang="uz">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Mahsulot Kirim - Sapphire Slate</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "background": "#0b1018",
+                        "surface": "#161f2c",
+                        "surface-light": "#1e293b"
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "2xl": "1.5rem", "3xl": "2rem" }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #0b1018; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(22, 31, 44, 0.9); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .footer-glass { background: rgba(11, 16, 24, 0.9); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.08); }
+        input[type="number"]::-webkit-inner-spin-button { display: none; }
+        .custom-shadow { shadow-box: 0 -10px 40px rgba(0,0,0,0.5); }
+    </style>
+</head>
+
+<body class="text-slate-200 min-h-screen">
+
+    <header class="fixed top-0 w-full z-50 flex items-center px-4 h-16 glass shadow-xl">
+        <button onclick="history.back()" class="p-2 mr-2 active:scale-90 duration-200 hover:bg-slate-800 rounded-full">
+            <span class="material-symbols-outlined text-primary">arrow_back</span>
+        </button>
+        <h1 class="font-bold text-lg tracking-tight">Mahsulot kirimi</h1>
+    </header>
+
+    <main class="pt-24 px-4 flex flex-col gap-8 pb-96">
+        
+        <section class="grid grid-cols-12 gap-3">
+            <button onclick="openScanner()" 
+                class="col-span-5 bg-primary text-white rounded-3xl p-5 flex flex-col items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-4xl">barcode_scanner</span>
+                <span class="text-[11px] font-extrabold uppercase tracking-tighter">Skanerlash</span>
+            </button>
+            
+            <div class="col-span-7 bg-surface rounded-3xl p-2 border border-slate-800/50 flex flex-col justify-center">
+                <div class="relative flex items-center px-4 h-full bg-background/50 rounded-2xl border border-slate-700/30">
+                    <span class="material-symbols-outlined text-slate-500 mr-2">search</span>
+                    <input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-600 p-0" 
+                           placeholder="Nomi yoki ID..." type="text" />
+                </div>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-5">
+            <div class="flex items-center justify-between px-2">
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    <span class="text-[10px] uppercase font-bold tracking-[0.2em] text-slate-500">Savatdagi mahsulotlar</span>
+                </div>
+                <span class="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-md border border-primary/20">
+                    {{ product_incomes_data|length|default:"2" }} TA
+                </span>
+            </div>
+
+            {% for pi in product_incomes_data %}
+            <div class="bg-surface rounded-[2rem] p-5 border border-slate-800/50 shadow-lg relative overflow-hidden group transition-all hover:border-slate-700">
+                <div class="flex justify-between items-start mb-5">
+                    <div class="flex flex-col gap-0.5 text-left">
+                        <h3 class="font-extrabold text-slate-100 text-sm tracking-tight group-hover:text-primary transition-colors">
+                            {{ pi.product.name|default:"iPhone 15 Pro Max" }}
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-mono text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                                ID: {{ pi.product.id|default:"8593021" }}
+                            </span>
+                            <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">
+                                Kirimda
+                            </span>
+                        </div>
+                    </div>
+                    <button class="size-8 flex items-center justify-center rounded-full bg-slate-900 text-slate-500 hover:bg-red-500/10 hover:text-red-500 transition-all active:scale-90">
+                        <span class="material-symbols-outlined text-lg">close</span>
+                    </button>
+                </div>
+                
+                <div class="flex flex-col gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest ml-1">Kirim miqdori</label>
+                        <div class="flex items-center bg-background rounded-2xl p-1 border border-slate-700/30 ring-1 ring-white/5">
+                            <button class="w-12 h-10 flex items-center justify-center text-slate-400 hover:text-primary active:scale-75 transition-all">
+                                <span class="material-symbols-outlined text-xl font-bold">remove</span>
+                            </button>
+                            <input class="bg-transparent border-none focus:ring-0 text-center text-base font-black w-full p-0 text-white" 
+                                   type="number" value="{{ pi.quantity|default:'1' }}" />
+                            <button class="w-12 h-10 flex items-center justify-center text-slate-400 hover:text-primary active:scale-75 transition-all">
+                                <span class="material-symbols-outlined text-xl font-bold">add</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Kirim narxi</label>
+                            <div class="flex items-center bg-slate-900/50 rounded-xl h-11 px-3 border border-slate-800 focus-within:border-primary/50 transition-colors">
+                                <input class="bg-transparent border-none focus:ring-0 text-xs font-bold w-full p-0 text-slate-200" 
+                                       type="text" value="{{ pi.product.input_price|default:'1,200.00' }}" />
+                                <span class="text-[8px] font-black text-slate-600 ml-1 uppercase">UZS</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Ulgurji narxi</label>
+                            <div class="flex items-center bg-slate-900/50 rounded-xl h-11 px-3 border border-slate-800 focus-within:border-primary/50 transition-colors">
+                                <input class="bg-transparent border-none focus:ring-0 text-xs font-bold w-full p-0 text-slate-200" 
+                                       type="text" value="{{ pi.product.wholesale_price|default:'1,300.00' }}" />
+                                <span class="text-[8px] font-black text-slate-600 ml-1 uppercase">UZS</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 col-span-2">
+                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Chakana sotuv narxi</label>
+                            <div class="flex items-center bg-primary/5 rounded-xl h-11 px-3 border border-primary/20 focus-within:border-primary transition-colors">
+                                <span class="material-symbols-outlined text-sm text-primary mr-2">sell</span>
+                                <input class="bg-transparent border-none focus:ring-0 text-sm font-black w-full p-0 text-primary" 
+                                       type="text" value="{{ pi.product.current_price|default:'1,450.00' }}" />
+                                <span class="text-[9px] font-black text-primary/60 ml-1 uppercase">UZS</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute -bottom-2 -right-2 opacity-[0.03] pointer-events-none group-hover:opacity-[0.07] transition-opacity">
+                    <span class="material-symbols-outlined text-8xl">inventory_2</span>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+    </main>
+
+    <div class="fixed bottom-0 left-0 w-full px-4 pb-8 pt-10 z-[45] pointer-events-none">
+        <div class="footer-glass border border-white/10 rounded-[2.5rem] p-6 shadow-[0_-20px_50px_rgba(0,0,0,0.6)] pointer-events-auto">
+            <div class="flex justify-between items-end mb-6 px-2">
+                <div>
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Umumiy summa</p>
+                    <div class="flex items-baseline gap-1.5">
+                        <p class="text-3xl font-black text-white leading-none">6,100,000</p>
+                        <span class="text-[10px] font-bold text-primary uppercase">UZS</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 text-right">Jami</p>
+                    <div class="flex items-baseline justify-end gap-1">
+                        <p class="text-xl font-black text-slate-200 leading-none">3</p>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase">dona</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="w-full bg-primary hover:bg-blue-600 text-white py-4 rounded-2xl font-extrabold flex items-center justify-center gap-3 active:scale-[0.97] transition-all shadow-xl shadow-primary/30 group">
+                <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">check_circle</span>
+                <span class="tracking-wide">KIRIMNI YAKUNLASH</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="scanner-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeScanner()"></div>
+        <div class="relative bg-surface w-full max-w-md rounded-[2.5rem] overflow-hidden border border-slate-700 shadow-2xl">
+            <div class="p-5 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">qr_code_scanner</span>
+                    <h2 class="font-bold text-sm tracking-tight">Shtrix-kodni skanerlash</h2>
+                </div>
+                <button onclick="closeScanner()" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors text-slate-400">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+            <div class="relative bg-black aspect-square w-full" id="reader"></div>
+            <div class="p-6 bg-surface text-center">
+                <div class="inline-flex items-center px-3 py-1 bg-primary/10 rounded-full border border-primary/20 mb-2">
+                    <span class="text-[10px] font-bold text-primary uppercase">Kamera faol</span>
+                </div>
+                <p class="text-xs text-slate-400">Shtrix-kodni kamera doirasiga qarating</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let html5QrCode;
+
+        function openScanner() {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Scrollni bloklash
+            
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { 
+                fps: 20, 
+                qrbox: { width: 280, height: 180 },
+                aspectRatio: 1.0
+            };
+
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                onScanSuccess
+            ).catch(err => {
+                console.error(err);
+                alert("Kamera ishga tushmadi. Ruxsat berilganini tekshiring.");
+                closeScanner();
+            });
+        }
+
+        function closeScanner() {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => html5QrCode.clear()).catch(err => console.error(err));
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            alert("Mahsulot kodi topildi: " + decodedText);
+            closeScanner();
+            // Bu yerda AJAX orqali backendga kodni yuborishingiz mumkin
+        }
+    </script>
+</body>
+</html>

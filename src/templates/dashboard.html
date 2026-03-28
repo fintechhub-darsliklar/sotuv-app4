@@ -1,47 +1,50 @@
 {% extends 'base.html' %}
 
 {% block style %}
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#136dec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101822",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope"]
-                    },
-                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#136dec",
+                    "background-light": "#f6f7f8",
+                    "background-dark": "#101822",
                 },
+                fontFamily: {
+                    "display": ["Manrope"]
+                },
+                borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
             },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Manrope', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
+        },
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+<style>
+    body {
+        font-family: 'Manrope', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+    }
 
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
-    <style>
-        body {
-            min-height: max(884px, 100dvh);
-        }
-    </style>
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+<style>
+    body {
+        min-height: max(884px, 100dvh);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
     <!-- Header / Status Bar Area -->
     <header
@@ -65,136 +68,193 @@
             </button>
         </div>
     </header>
-    <main class="flex-1 px-4 pb-32">
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-2 gap-3 mt-4">
+    <div class="grid grid-cols-2 gap-3 mt-4">
+        <div
+            class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex flex-col">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Bugungi Savdo</span>
+            <div class="text-lg font-bold">{{ todays_income }} <span class="text-xs font-normal opacity-70">UZS</span>
+            </div>
+            <div class="mt-2 h-20 w-full"> <canvas id="incomeChart"></canvas>
+            </div>
+        </div>
+
+        <div
+            class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex flex-col">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Sof Foyda</span>
+            <div class="text-lg font-bold">{{ todays_profit }} <span class="text-xs font-normal opacity-70">UZS</span>
+            </div>
+            <div class="mt-2 h-20 w-full">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- Section Title -->
+    <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-8 mb-4 px-2 uppercase tracking-widest">
+        Boshqaruv Modullari</h2>
+    <!-- Navigation Grid -->
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Products Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="{% url 'products_page' %}">
             <div
-                class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2">
-                <div class="flex justify-between items-start">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Bugungi Savdo</span>
-                    <span
-                        class="text-emerald-500 text-[10px] font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">+12%</span>
+                class="size-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">inventory_2</span>
+            </div>
+            <span class="text-sm font-bold dark:text-white">Mahsulotlar</span>
+        </a>
+        <!-- POS Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="{% url 'sotuv_page' %}">
+            <div
+                class="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">point_of_sale</span>
+            </div>
+            <span class="text-sm font-bold dark:text-white">Sotuv (POS)</span>
+        </a>
+        <!-- Inventory Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="{% url 'monitoring_page' %}">
+            <div
+                class="size-14 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors relative">
+                <span class="material-symbols-outlined text-3xl">swap_horiz</span>
+                <span
+                    class="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
+            </div>
+            <span class="text-sm font-bold dark:text-white">Kirim-Chiqim</span>
+        </a>
+        <!-- Analytics Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="{% url 'product_income_page' %}">
+
+            <div
+                class="size-14 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-indigo-200 dark:group-hover:shadow-none">
+                <span class="material-symbols-outlined text-3xl">downloading</span>
+            </div>
+
+            <div class="flex flex-col gap-0.5">
+                <span class="text-sm font-bold dark:text-white">Mahsulot Kirimi</span>
+                <span class="text-[10px] text-slate-400 font-medium uppercase tracking-tight">Omborga qabul</span>
+            </div>
+        </a>
+        <!-- Users Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="#">
+            <div
+                class="size-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">group</span>
+            </div>
+            <span class="text-sm font-bold dark:text-white">Xodimlar</span>
+        </a>
+        <!-- Settings Card -->
+        <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
+            href="#">
+            <div
+                class="size-14 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center group-hover:bg-slate-500 group-hover:text-white transition-colors">
+                <span class="material-symbols-outlined text-3xl">settings_suggest</span>
+            </div>
+            <span class="text-sm font-bold dark:text-white">Sozlamalar</span>
+        </a>
+    </div>
+    <!-- Recent Activity Mini Section -->
+    <div class="mt-8">
+        <div class="flex items-center justify-between mb-4 px-2">
+            <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">So'nggi
+                harakatlar</h2>
+            <a class="text-xs font-bold text-primary" href="#">Barchasi</a>
+        </div>
+        <div class="space-y-3">
+            <div
+                class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
+                <div class="size-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
                 </div>
-                <div class="text-lg font-bold">1,250,000 <span class="text-xs font-normal opacity-70">UZS</span></div>
-                <div class="mt-2 h-8 w-full overflow-hidden">
-                    <svg class="w-full h-full stroke-primary fill-primary/10" preserveaspectratio="none"
-                        viewbox="0 0 100 30">
-                        <path d="M0,25 Q10,15 20,20 T40,10 T60,22 T80,15 T100,5 L100,30 L0,30 Z" stroke-width="2">
-                        </path>
-                    </svg>
+                <div class="flex-1">
+                    <p class="text-sm font-bold">Yangi sotuv #2491</p>
+                    <p class="text-[10px] text-slate-400">2 daqiqa avval • Kassa 01</p>
                 </div>
+                <p class="text-sm font-bold text-emerald-500">+145,000</p>
             </div>
             <div
-                class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex flex-col gap-2">
-                <div class="flex justify-between items-start">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Sof Foyda</span>
-                    <span
-                        class="text-emerald-500 text-[10px] font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded">+8%</span>
+                class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
+                <div class="size-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-xl">warning</span>
                 </div>
-                <div class="text-lg font-bold">450,000 <span class="text-xs font-normal opacity-70">UZS</span></div>
-                <div class="mt-2 h-8 w-full overflow-hidden">
-                    <svg class="w-full h-full stroke-emerald-500 fill-emerald-500/10" preserveaspectratio="none"
-                        viewbox="0 0 100 30">
-                        <path d="M0,20 Q15,25 30,15 T60,10 T85,18 T100,12 L100,30 L0,30 Z" stroke-width="2"></path>
-                    </svg>
+                <div class="flex-1">
+                    <p class="text-sm font-bold">Kam qolgan mahsulot</p>
+                    <p class="text-[10px] text-slate-400">1 soat avval • Coca-Cola 0.5L</p>
                 </div>
+                <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
             </div>
         </div>
-        <!-- Section Title -->
-        <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 mt-8 mb-4 px-2 uppercase tracking-widest">
-            Boshqaruv Modullari</h2>
-        <!-- Navigation Grid -->
-        <div class="grid grid-cols-2 gap-4">
-            <!-- Products Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="{% url 'products_page' %}">
-                <div
-                    class="size-14 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-3xl">inventory_2</span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Mahsulotlar</span>
-            </a>
-            <!-- POS Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="{% url 'sotuv_page' %}">
-                <div
-                    class="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-3xl">point_of_sale</span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Sotuv (POS)</span>
-            </a>
-            <!-- Inventory Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="{% url 'monitoring_page' %}">
-                <div
-                    class="size-14 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors relative">
-                    <span class="material-symbols-outlined text-3xl">swap_horiz</span>
-                    <span
-                        class="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Kirim-Chiqim</span>
-            </a>
-            <!-- Analytics Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="#">
-                <div
-                    class="size-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-3xl">query_stats</span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Analitika</span>
-            </a>
-            <!-- Users Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="#">
-                <div
-                    class="size-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-3xl">group</span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Xodimlar</span>
-            </a>
-            <!-- Settings Card -->
-            <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-                href="#">
-                <div
-                    class="size-14 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center group-hover:bg-slate-500 group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-3xl">settings_suggest</span>
-                </div>
-                <span class="text-sm font-bold dark:text-white">Sozlamalar</span>
-            </a>
-        </div>
-        <!-- Recent Activity Mini Section -->
-        <div class="mt-8">
-            <div class="flex items-center justify-between mb-4 px-2">
-                <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">So'nggi
-                    harakatlar</h2>
-                <a class="text-xs font-bold text-primary" href="#">Barchasi</a>
-            </div>
-            <div class="space-y-3">
-                <div
-                    class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
-                    <div class="size-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-bold">Yangi sotuv #2491</p>
-                        <p class="text-[10px] text-slate-400">2 daqiqa avval • Kassa 01</p>
-                    </div>
-                    <p class="text-sm font-bold text-emerald-500">+145,000</p>
-                </div>
-                <div
-                    class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
-                    <div class="size-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-xl">warning</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-bold">Kam qolgan mahsulot</p>
-                        <p class="text-[10px] text-slate-400">1 soat avval • Coca-Cola 0.5L</p>
-                    </div>
-                    <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
-                </div>
-            </div>
-        </div>
+    </div>
     </main>
+    <script>
+        const chartLabels = {{ labels| safe }};
+        const incomeValues = {{ income_data| safe }};
+        const profitValues = {{ profit_data| safe }};
 
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    titleFont: { size: 10 },
+                    bodyFont: { size: 11 }
+                }
+            },
+            scales: {
+                x: {
+                    display: true, // Endi kunlar ko'rinadi
+                    grid: { display: false }, // Chiziqlar kerak emas
+                    ticks: {
+                        font: { size: 8 }, // Matn kichikroq bo'lishi uchun
+                        color: '#94a3b8',
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                },
+                y: {
+                    display: false,
+                    beginAtZero: true
+                }
+            },
+            elements: {
+                line: { tension: 0.4, borderWidth: 2.5 },
+                point: { radius: 2, hoverRadius: 5 } // Nuqtalarni kichik qilib chiqardik
+            }
+        };
 
-{% endblock %}
+        // Income Chart
+        new Chart(document.getElementById('incomeChart'), {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: incomeValues,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Profit Chart
+        new Chart(document.getElementById('profitChart'), {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: profitValues,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true
+                }]
+            },
+            options: commonOptions
+        });
+    </script>
+    {% endblock %}

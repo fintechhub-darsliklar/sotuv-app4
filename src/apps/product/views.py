@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Category, Product
+from .models import Category, Product, ProductInput
 # Create your views here.
 
 
@@ -73,6 +73,7 @@ def categories_create_page(request):
         return redirect("products_page")
     return render(request, "category-create.html", context={})
 
+
 def category_delete(request, pk):
     Category.objects.get(id=pk).delete()
     return redirect("products_page")
@@ -106,3 +107,13 @@ def product_update(request, pk):
         "product": product,
         "categories": Category.objects.all()
     })
+
+
+def product_income_page(request):
+
+    product_incomes_data = ProductInput.objects.filter(is_added=False)
+    context = {
+        "product_incomes_data": product_incomes_data
+    }
+    print(product_incomes_data)
+    return render(request, "products-income.html", context=context)

@@ -97,7 +97,7 @@
                 <select name="product_category" class="w-full p-4 rounded-xl bg-white dark:bg-slate-800">
                     <option value="">Tanlang</option>
                     {% for category in categories %}
-                    <option value="{{category.id}}" {% if product.category.id==category.id %}selected{% endif %}>
+                    <option value="{{category.id}}" {% if product.category.id == category.id %}selected{% endif %}>
                         {{category.name}}
                     </option>
                     {% endfor %}
