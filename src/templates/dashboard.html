@@ -117,8 +117,6 @@
             <div
                 class="size-14 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors relative">
                 <span class="material-symbols-outlined text-3xl">swap_horiz</span>
-                <span
-                    class="absolute -top-1 -right-1 size-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
             </div>
             <span class="text-sm font-bold dark:text-white">Kirim-Chiqim</span>
         </a>
@@ -147,7 +145,7 @@
         </a>
         <!-- Settings Card -->
         <a class="group bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-95"
-            href="#">
+            href="{% url 'profile_page' %}">
             <div
                 class="size-14 rounded-2xl bg-slate-500/10 text-slate-500 flex items-center justify-center group-hover:bg-slate-500 group-hover:text-white transition-colors">
                 <span class="material-symbols-outlined text-3xl">settings_suggest</span>
@@ -157,36 +155,41 @@
     </div>
     <!-- Recent Activity Mini Section -->
     <div class="mt-8">
-        <div class="flex items-center justify-between mb-4 px-2">
-            <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">So'nggi
-                harakatlar</h2>
-            <a class="text-xs font-bold text-primary" href="#">Barchasi</a>
-        </div>
-        <div class="space-y-3">
-            <div
-                class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
-                <div class="size-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-xl">add_shopping_cart</span>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-bold">Yangi sotuv #2491</p>
-                    <p class="text-[10px] text-slate-400">2 daqiqa avval • Kassa 01</p>
-                </div>
-                <p class="text-sm font-bold text-emerald-500">+145,000</p>
-            </div>
-            <div
-                class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4">
-                <div class="size-10 rounded-lg bg-orange-500/10 text-orange-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-xl">warning</span>
-                </div>
-                <div class="flex-1">
-                    <p class="text-sm font-bold">Kam qolgan mahsulot</p>
-                    <p class="text-[10px] text-slate-400">1 soat avval • Coca-Cola 0.5L</p>
-                </div>
-                <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
-            </div>
-        </div>
+    <div class="flex items-center justify-between mb-4 px-2">
+        <h2 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+            So'nggi harakatlar
+        </h2>
+        <a class="text-xs font-bold text-primary hover:underline" href="{% url 'monitoring_page' %}">Barchasi</a>
     </div>
+    
+    <div class="space-y-3">
+        {% for activity in recent_activities %}
+        <div class="bg-white dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 flex items-center gap-4 transition-transform active:scale-[0.98]">
+            
+            <div class="size-10 rounded-lg {{ activity.bg_color }} {{ activity.text_color }} flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-xl">{{ activity.icon }}</span>
+            </div>
+            
+            <div class="flex-1 truncate">
+                <p class="text-sm font-bold truncate">{{ activity.title }}</p>
+                <p class="text-[10px] text-slate-400 truncate">{{ activity.time|timesince }} avval • {{ activity.desc }}</p>
+            </div>
+            
+            {% if activity.amount %}
+                <p class="text-sm font-bold {{ activity.text_color }} shrink-0">{{ activity.amount }}</p>
+            {% else %}
+                <span class="material-symbols-outlined text-slate-400 text-lg shrink-0">chevron_right</span>
+            {% endif %}
+            
+        </div>
+        {% empty %}
+        <div class="text-center py-6 text-slate-400 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+            <span class="material-symbols-outlined text-3xl mb-1 opacity-50">history</span>
+            <p class="text-xs font-medium">Hozircha harakatlar yo'q</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
     </main>
     <script>
         const chartLabels = {{ labels| safe }};

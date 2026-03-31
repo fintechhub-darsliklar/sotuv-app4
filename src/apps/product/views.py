@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Category, Product, ProductInput
+from django.db.models import Sum, F
+from decimal import Decimal, InvalidOperation
 # Create your views here.
 
-
-def monitoring_page(request):
-    return render(request, "monitoring.html")
 
 
 def products_page(request):
@@ -111,9 +110,101 @@ def product_update(request, pk):
 
 def product_income_page(request):
 
+    if request.method == "POST":
+        product_incomes_data = ProductInput.objects.filter(is_added=False)
+        for pi in product_incomes_data:
+            try:
+                # Formadan kelgan ma'lumotdan vergul va bo'shliqlarni olib tashlaymiz
+                i_price = request.POST.get(f"input_price_{pi.product.id}", 0)
+                w_price = request.POST.get(f"wholesale_price_{pi.product.id}", 0)
+                c_price = request.POST.get(f"current_price_{pi.product.id}", 0)
+                pi.product.qoldiq += pi.quantity
+                pi.product.current_price = Decimal(c_price) if c_price else Decimal('0.00')
+                pi.product.input_price = Decimal(i_price) if i_price else Decimal('0.00')
+                pi.product.wholesale_price = Decimal(w_price) if w_price else Decimal('0.00')
+                pi.is_added = True
+                pi.product.save()
+                pi.save()
+            except (InvalidOperation, IndexError) as e:
+                # Agar noto'g'ri raqam kiritilsa yoki index topilmasa nima qilish kerakligini shu yerda yozasiz
+                print(f"Xatolik yuz berdi: {e}")
+        return redirect("dashboard_page")
+
+    action = request.GET.get("action", 'list')
+    if action == "delete":
+        p_i_id = request.GET.get("p_i_id", None)
+        if p_i_id:
+            pi = ProductInput.objects.filter(id=p_i_id)
+            pi.delete()
+    elif action == "decrease":
+        p_i_id = request.GET.get("p_i_id", None)
+        if p_i_id:
+            pi = ProductInput.objects.get(id=p_i_id)
+            pi.quantity -= 1
+            if pi.quantity == 0:
+                pi.delete()
+            else:
+                pi.save()
+    elif action == "increase":
+        p_i_id = request.GET.get("p_i_id", None)
+        if p_i_id:
+            pi = ProductInput.objects.get(id=p_i_id)
+            pi.quantity += 1
+            pi.save()
+
     product_incomes_data = ProductInput.objects.filter(is_added=False)
+    total_input_price = product_incomes_data.aggregate(
+        total=Sum(F('quantity') * F('product__input_price'))
+    )['total'] or 0
+    
     context = {
-        "product_incomes_data": product_incomes_data
+        "product_incomes_data": product_incomes_data,
+        "total_input_price": total_input_price
     }
-    print(product_incomes_data)
     return render(request, "products-income.html", context=context)
+
+
+
+def product_income_products_page(request):
+    category_id = request.GET.get("category_id", 'all')
+    product_id = request.GET.get("product_id", None)
+    barcode = request.GET.get("barcode", None)
+
+    if product_id or barcode:
+        print("barcode", barcode)
+        if product_id:
+            product = Product.objects.filter(id=product_id)
+        else:
+            product = Product.objects.filter(barcode=barcode)
+            print(product)
+        if product.exists():
+            product = product.first()
+            product_income = ProductInput.objects.filter(product=product, is_added=False)
+            if product_income.exists():
+                pi = product_income.first()
+                pi.quantity += 1
+                pi.save()
+            else:
+                ProductInput.objects.create(
+                    product=product,
+                    quantity=1,
+                    new_input_price=product.input_price,
+                    new_current_price=product.current_price,
+                    new_wholesale_price=product.wholesale_price,
+                )
+        return redirect('product_income_page')
+    
+    
+    if category_id == "all":
+        products = Product.objects.all()
+    else:
+        products = Product.objects.filter(category__id=category_id)
+        category_id = int(category_id)
+    categories = Category.objects.all()
+    context = {
+        'products': products,
+        "categories": categories,
+        "selected_category_id": category_id
+    }
+    return render(request, "product-income-products.html", context=context)
+

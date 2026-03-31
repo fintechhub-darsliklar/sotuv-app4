@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tz %} {# Vaqt zonalarini to'g'ri ishlashi uchun #}
 
 {% block style %}
     <script id="tailwind-config">
@@ -31,8 +32,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-    </style>
-    <style>
         body {
             min-height: max(884px, 100dvh);
         }
@@ -41,105 +40,112 @@
 
 {% block content %}
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
-    <header
-        class="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pt-12 pb-4 border-b border-slate-200 dark:border-slate-800">
+    
+    <header class="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-4 pt-12 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
-                <a href="{% url 'dashboard_page' %}"><button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
-                    <span class="material-symbols-outlined">arrow_back_ios_new</span>
-                </button></a>
+                <a href="{% url 'dashboard_page' %}">
+                    <button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                        <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                    </button>
+                </a>
                 <h1 class="text-xl font-bold dark:text-white">Kirim-Chiqim</h1>
             </div>
-            <button class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+            <button class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
                 <span class="material-symbols-outlined">filter_list</span>
             </button>
         </div>
+
         <div class="bg-slate-200/50 dark:bg-slate-800/80 p-1 rounded-xl flex items-center relative">
-            <button
-                class="flex-1 py-2 text-sm font-semibold text-primary bg-white dark:bg-slate-700 shadow-sm rounded-lg transition-all">
+            <a href="?tab=kirim{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="flex-1 text-center py-2 text-sm font-semibold rounded-lg transition-all
+               {% if current_tab == 'kirim' %} text-primary bg-white dark:bg-slate-700 shadow-sm {% else %} text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 {% endif %}">
                 Kirim
-            </button>
-            <button class="flex-1 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
+            </a>
+            <a href="?tab=chiqim{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="flex-1 text-center py-2 text-sm font-semibold rounded-lg transition-all
+               {% if current_tab == 'chiqim' %} text-primary bg-white dark:bg-slate-700 shadow-sm {% else %} text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 {% endif %}">
                 Chiqim
-            </button>
-            <button class="flex-1 py-2 text-sm font-semibold text-slate-500 dark:text-slate-400">
+            </a>
+            <a href="?tab=tarix{% if search_query %}&q={{ search_query }}{% endif %}" 
+               class="flex-1 text-center py-2 text-sm font-semibold rounded-lg transition-all
+               {% if current_tab == 'tarix' or not current_tab %} text-primary bg-white dark:bg-slate-700 shadow-sm {% else %} text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 {% endif %}">
                 Tarix
-            </button>
+            </a>
         </div>
     </header>
+
     <main class="flex-1 px-4 pt-6 pb-32">
-        <div class="relative mb-6">
-            <span
-                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-            <input
-                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary shadow-sm"
+        
+        <form method="GET" class="relative mb-6">
+            <input type="hidden" name="tab" value="{{ current_tab }}">
+            
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+            <input name="q" value="{{ search_query|default:'' }}"
+                class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-800 border-none rounded-2xl text-sm focus:ring-2 focus:ring-primary shadow-sm text-slate-900 dark:text-white placeholder:text-slate-400"
                 placeholder="Mahsulot qidirish..." type="text" />
-        </div>
+            
+            <button type="submit" class="hidden"></button>
+        </form>
+
         <div class="space-y-4">
-            <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1">Bugun</h2>
-            <div
-                class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                <div class="size-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">south_east</span>
+            
+            {% regroup transactions by created_at.date as grouped_transactions %}
+
+            {% for date_group in grouped_transactions %}
+                
+                <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1 {% if not forloop.first %}mt-6{% endif %}">
+                    {% now "Y-m-d" as current_date %}
+                    {% if date_group.grouper|date:"Y-m-d" == current_date %}
+                        Bugun
+                    {% else %}
+                        {{ date_group.grouper|date:"d M, Y" }}
+                    {% endif %}
+                </h2>
+
+                {% for item in date_group.list %}
+                    <div class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4 transition-transform active:scale-[0.98]">
+                        
+                        {% if item.is_positive %}
+                            <div class="size-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-2xl">{{ item.icon }}</span>
+                            </div>
+                        {% else %}
+                            <div class="size-12 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-2xl">{{ item.icon }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold truncate">{{ item.product_name }}</h3>
+                            <p class="text-[11px] text-slate-400 mt-0.5 truncate">{{ item.location }} • {{ item.created_at|date:"H:i" }}</p>
+                        </div>
+
+                        <div class="text-right shrink-0">
+                            <p class="text-sm font-bold {{ item.color }}">
+                                {% if item.is_positive %}+{% else %}-{% endif %}{{ item.quantity }} dona
+                            </p>
+                            <p class="text-[10px] text-slate-500">{{ item.type }}</p>
+                        </div>
+
+                    </div>
+                {% endfor %}
+            
+            {% empty %}
+                <div class="text-center py-10">
+                    <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-2">inventory_2</span>
+                    <p class="text-sm font-medium text-slate-500">Hech qanday ma'lumot topilmadi.</p>
                 </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold">Coca-Cola 1.5L</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Asosiy ombor • 14:20</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-bold text-emerald-500">+48 dona</p>
-                    <p class="text-[10px] text-slate-500">Kirim</p>
-                </div>
-            </div>
-            <div
-                class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                <div class="size-12 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">north_east</span>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold">Pepsi 0.5L</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Savdo zali • 11:45</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-bold text-rose-500">-12 dona</p>
-                    <p class="text-[10px] text-slate-500">Chiqim</p>
-                </div>
-            </div>
-            <h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest px-1 mt-6">Kecha
-            </h2>
-            <div
-                class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                <div class="size-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">south_east</span>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold">Lays Chips Max</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Asosiy ombor • 18:30</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-bold text-emerald-500">+100 dona</p>
-                    <p class="text-[10px] text-slate-500">Kirim</p>
-                </div>
-            </div>
-            <div
-                class="bg-white dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                <div class="size-12 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">north_east</span>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold">Dena Olma Sharbat</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Savdo zali • 16:15</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-bold text-rose-500">-5 dona</p>
-                    <p class="text-[10px] text-slate-500">Chiqim</p>
-                </div>
-            </div>
+            {% endfor %}
+
         </div>
     </main>
-    <button
-        class="fixed bottom-24 right-6 size-14 bg-primary text-white rounded-2xl shadow-lg shadow-primary/40 flex items-center justify-center active:scale-95 transition-transform z-40">
-        <span class="material-symbols-outlined text-3xl">add</span>
-    </button>
+
+    <a href="#">
+        <button class="fixed bottom-24 right-6 size-14 bg-primary hover:bg-blue-600 text-white rounded-2xl shadow-lg shadow-primary/40 flex items-center justify-center active:scale-95 transition-all z-40 group">
+            <span class="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform">add</span>
+        </button>
+    </a>
     
+</body>
 {% endblock %}
