@@ -4,7 +4,6 @@ from django.utils import timezone
 from apps.order.models import Order, OrderItem
 from django.db.models import Sum, F
 from datetime import timedelta
-from apps.order.models import Order
 from apps.product.models import ProductInput
 
 # Create your views here.
@@ -83,7 +82,7 @@ def dashboard_page(request):
     
     # Faqat eng oxirgi 5 tasini ajratib olamiz
     recent_activities = activities[:5]
-
+    shop = request.user.stuff.last().shop
 
     data = {
         "todays_income": todays_income,
@@ -92,6 +91,7 @@ def dashboard_page(request):
         "income_data": income_list,
         "profit_data": profit_list,
         "recent_activities": recent_activities, # Contextga qoshamiz
+        "shop": shop,
     }
 
     return render(request, "dashboard.html", context=data)
